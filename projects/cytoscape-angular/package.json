@@ -6,7 +6,15 @@
   "repository": "https://github.com/michaelbushe/cytoscape-angular.git",
   "homepage": "https://github.com/michaelbushe/cytoscape--angular",
   "keywords": [
-    "cytoscape", "cytoscape.js", "angular", "graph", "bioinformatics", "finance", "javascript", "typescript", "component"
+    "cytoscape",
+    "cytoscape.js",
+    "angular",
+    "graph",
+    "bioinformatics",
+    "finance",
+    "javascript",
+    "typescript",
+    "component"
   ],
   "license": "MIT",
   "peerDependencies": {

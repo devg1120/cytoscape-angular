@@ -1,0 +1,176 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "cytoscape-angular-demo": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "projects/cytoscape-angular-demo",
+      "sourceRoot": "projects/cytoscape-angular-demo/src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/cytoscape-angular-demo",
+            "index": "projects/cytoscape-angular-demo/src/index.html",
+            "main": "projects/cytoscape-angular-demo/src/main.ts",
+            "polyfills": "projects/cytoscape-angular-demo/src/polyfills.ts",
+            "tsConfig": "projects/cytoscape-angular-demo/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              "projects/cytoscape-angular-demo/src/favicon.ico",
+              "projects/cytoscape-angular-demo/src/assets"
+            ],
+            "styles": [
+              "node_modules/primeng/resources/themes/nova-light/theme.css",
+              "node_modules/primeng/resources/primeng.min.css",
+              "node_modules/primeicons/primeicons.css",
+              "projects/cytoscape-angular-demo/src/styles.scss"
+            ],
+            "scripts": [
+              "node_modules/cytoscape/dist/cytoscape.min.js"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "projects/cytoscape-angular-demo/src/environments/environment.ts",
+                  "with": "projects/cytoscape-angular-demo/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "options": {
+            "browserTarget": "cytoscape-angular-demo:build"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "cytoscape-angular-demo:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "cytoscape-angular-demo:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/cytoscape-angular-demo/src/test.ts",
+            "polyfills": "projects/cytoscape-angular-demo/src/polyfills.ts",
+            "tsConfig": "projects/cytoscape-angular-demo/tsconfig.spec.json",
+            "karmaConfig": "projects/cytoscape-angular-demo/karma.conf.js",
+            "assets": [
+              "projects/cytoscape-angular-demo/src/favicon.ico",
+              "projects/cytoscape-angular-demo/src/assets"
+            ],
+            "styles": [
+              "projects/cytoscape-angular-demo/src/styles.scss"
+            ],
+            "scripts": []
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/cytoscape-angular-demo/tsconfig.app.json",
+              "projects/cytoscape-angular-demo/tsconfig.spec.json",
+              "projects/cytoscape-angular-demo/e2e/tsconfig.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        },
+        "e2e": {
+          "builder": "@angular-devkit/build-angular:protractor",
+          "options": {
+            "protractorConfig": "projects/cytoscape-angular-demo/e2e/protractor.conf.js",
+            "devServerTarget": "cytoscape-angular-demo:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "cytoscape-angular-demo:serve:production"
+            }
+          }
+        }
+      }
+    },
+    "cytoscape-angular": {
+      "projectType": "library",
+      "root": "projects/cytoscape-angular",
+      "sourceRoot": "projects/cytoscape-angular/src",
+      "prefix": "lib",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-ng-packagr:build",
+          "options": {
+            "tsConfig": "projects/cytoscape-angular/tsconfig.lib.json",
+            "project": "projects/cytoscape-angular/ng-package.json"
+          },
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/cytoscape-angular/tsconfig.lib.prod.json"
+            }
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "main": "projects/cytoscape-angular/src/test.ts",
+            "tsConfig": "projects/cytoscape-angular/tsconfig.spec.json",
+            "karmaConfig": "projects/cytoscape-angular/karma.conf.js"
+          }
+        },
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "projects/cytoscape-angular/tsconfig.lib.json",
+              "projects/cytoscape-angular/tsconfig.spec.json"
+            ],
+            "exclude": [
+              "**/node_modules/**"
+            ]
+          }
+        }
+      }
+    }},
+  "cli": {
+    "analytics": "be3a80a9-889b-40dd-a9f6-b0f280335b17"
+  },
+  "defaultProject": "cytoscape-angular-demo"
+}
