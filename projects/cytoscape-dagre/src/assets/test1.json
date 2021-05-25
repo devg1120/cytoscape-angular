@@ -1,0 +1,99 @@
+{
+    "format_version": "1.0",
+    "generated_by": "graphspace-2.0.0",
+    "target_cytoscapejs_version": "~2.7",
+    "style": [
+               {
+                 "selector": "node",
+                 "style": {
+                   "background-color": "#bdd3d4",
+                   "label": "data(id)",
+                   "text-valign": "center",
+                   "background-opacity": 0.7
+                 }
+               },         
+             
+               {
+               "selector": ":parent",
+                 "style": {
+                   "background-color": "#e8e8e8",
+                   "border-color": "#DADADA",
+                   "text-valign": "bottom"
+                 }
+               },
+             
+               {
+                 "selector": "edge",
+                 "style": {
+                   "curve-style": "straight",
+                   "line-color": "#bdd3d4"
+                 }
+               },
+             
+               {
+                 "selector": "node:selected",
+                 "style": {
+                   "background-color": "#33ff00",
+                   "border-color": "#22ee00"
+                 }
+               },
+               
+               {
+                 "selector": "node.fixed",
+                 "style": {
+                   "shape": "diamond",
+                   "background-color": "#9D9696"
+                 }
+               }, 
+               
+               {
+                 "selector": "node.fixed:selected",
+                 "style": {
+                   "background-color": "#33ff00"
+                 }
+               },
+               
+               {
+                 "selector": "node.alignment",
+                 "style": {
+                   "shape": "round-heptagon",
+                   "background-color": "#fef2d1"
+                 }
+               }, 
+               
+               {
+                 "selector": "node.alignment:selected",
+                 "style": {
+                   "background-color": "#33ff00"
+                 }
+               },  
+             
+               {
+                 "selector": "node.relative",
+                 "style": {
+                   "shape": "rectangle",
+                   "background-color": "#fed3d1"
+                 }
+               }, 
+               
+               {
+                 "selector": "node.relative:selected",
+                 "style": {
+                   "background-color": "#33ff00"
+                 }
+               },
+             
+               {
+                 "selector": "edge:selected",
+                 "style": {
+                   "line-color": "#33ff00"
+                 }
+               }    
+             
+
+    ],
+    "legend": {
+        "nodes": {},
+        "edges": {}
+    }
+}
