@@ -57,6 +57,7 @@
     "codelyzer": "^5.1.2",
     "cytoscape": "^3.14.2",
     "cytoscape-dagre": "^2.2.2",
+    "cytoscape-cola": "*",
     "dagre": "^0.8.5",
     "jasmine-core": "~3.5.0",
     "jasmine-spec-reporter": "~4.2.1",

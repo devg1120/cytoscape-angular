@@ -1,0 +1,30 @@
+{    "format_version": "1.0",
+    "generated_by": "graphspace-2.0.0",
+    "target_cytoscapejs_version": "~2.7",
+    "elements": {
+        "nodes": [
+          {"data": {"id": "n1", "label": "n1"}},    
+          {"data": {"id": "n2"}},
+          {"data": {"id": "n3", "parent": "n8"}},
+          {"data": {"id": "n5"}},
+          {"data": {"id": "n6", "parent": "n8"}},
+          {"data": {"id": "n7", "parent": "n8"}},
+          {"data": {"id": "n8"}},
+          {"data": {"id": "f1"}, "classes": ["fixed"]},
+          {"data": {"id": "f2"}, "classes": ["fixed"]},
+          {"data": {"id": "f3", "parent": "n8"}, "classes": ["fixed"]}
+        ],
+        "edges": [
+          {"data": {"source": "n1", "target": "f1"}},
+          {"data": {"source": "n1", "target": "n3"}},
+          {"data": {"source": "f1", "target": "n2"}},
+          {"data": {"source": "f1", "target": "n3"}},
+          {"data": {"source": "n3", "target": "f2"}},
+          {"data": {"source": "f2", "target": "n5"}},
+          {"data": {"source": "n5", "target": "n8"}},
+          {"data": {"source": "n6", "target": "n3"}},
+          {"data": {"source": "n6", "target": "n7"}},
+          {"data": {"source": "n6", "target": "f3"}}
+        ]
+     }
+}

@@ -1,41 +1,168 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core'
 import { EdgeDefinition, NodeDefinition, Stylesheet } from 'cytoscape'
 import dagre from 'cytoscape-dagre'
+import fcose from 'cytoscape-fcose';
+import cola from 'cytoscape-cola';
+
 import { CyNodeService } from './cy-node.service'
 import { CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular'
 import { StylesheetImpl } from '../../../cytoscape-angular/src/lib/style/style'
 
 declare var cytoscape: any
 
+var defaultOptions = {
+  animate: true, // whether to show the layout as it's running
+  refresh: 1, // number of ticks per frame; higher is faster but more jerky
+  maxSimulationTime: 4000, // max length in ms to run the layout
+  ungrabifyWhileSimulating: false, // so you can't drag nodes during layout
+  fit: true, // on every layout reposition of nodes, fit the viewport
+  padding: 30, // padding around the simulation
+  boundingBox: undefined, // constrain layout bounds; { x1, y1, x2, y2 } or { x1, y1, w, h }
+  nodeDimensionsIncludeLabels: false, // whether labels should be included in determining the space used by a node
+
+  // layout event callbacks
+  ready: function(){}, // on layoutready
+  stop: function(){}, // on layoutstop
+
+  // positioning options
+  randomize: false, // use random node positions at beginning of layout
+  avoidOverlap: true, // if true, prevents overlap of node bounding boxes
+  handleDisconnected: true, // if true, avoids disconnected components from overlapping
+  convergenceThreshold: 0.01, // when the alpha value (system energy) falls below this value, the layout stops
+  nodeSpacing: function( node ){ return 10; }, // extra spacing around nodes
+  flow: undefined, // use DAG/tree flow layout if specified, e.g. { axis: 'y', minSeparation: 30 }
+  alignment: undefined, // relative alignment constraints on nodes, e.g. {vertical: [[{node: node1, offset: 0}, {node: node2, offset: 5}]], horizontal: [[{node: node3}, {node: node4}], [{node: node5}, {node: node6}]]}
+  gapInequalities: undefined, // list of inequality constraints for the gap between the nodes, e.g. [{"axis":"y", "left":node1, "right":node2, "gap":25}]
+
+  // different methods of specifying edge length
+  // each can be a constant numerical value or a function like `function( edge ){ return 2; }`
+  edgeLength: undefined, // sets edge length directly in simulation
+  edgeSymDiffLength: undefined, // symmetric diff edge length in simulation
+  edgeJaccardLength: undefined, // jaccard edge length in simulation
+
+  // iterations of cola algorithm; uses default values on undefined
+  unconstrIter: undefined, // unconstrained initial layout iterations
+  userConstIter: undefined, // initial layout iterations with user-specified constraints
+  allConstIter: undefined, // initial layout iterations with all constraints including non-overlap
+
+};
+
+
+//var defaultOptions = {
+//
+//  // 'draft', 'default' or 'proof' 
+//  // - "draft" only applies spectral layout 
+//  // - "default" improves the quality with incremental layout (fast cooling rate)
+//  // - "proof" improves the quality with incremental layout (slow cooling rate) 
+//  quality: "default",
+//  // Use random node positions at beginning of layout
+//  // if this is set to false, then quality option must be "proof"
+//  randomize: true, 
+//  // Whether or not to animate the layout
+//  animate: true, 
+//  // Duration of animation in ms, if enabled
+//  animationDuration: 1000, 
+//  // Easing of animation, if enabled
+//  animationEasing: undefined, 
+//  // Fit the viewport to the repositioned nodes
+//  fit: true, 
+//  // Padding around layout
+//  padding: 30,
+//  // Whether to include labels in node dimensions. Valid in "proof" quality
+//  nodeDimensionsIncludeLabels: false,
+//  // Whether or not simple nodes (non-compound nodes) are of uniform dimensions
+//  uniformNodeDimensions: false,
+//  // Whether to pack disconnected components - valid only if randomize: true
+//  packComponents: true,
+//  // Layout step - all, transformed, enforced, cose - for debug purpose only
+//  step: "all",
+//           
+//  /* spectral layout options */
+//              
+//  // False for random, true for greedy sampling
+//  samplingType: true,
+//  // Sample size to construct distance matrix
+//  sampleSize: 25,
+//  // Separation amount between nodes
+//  nodeSeparation: 75,
+//  // Power iteration tolerance
+//  piTol: 0.0000001,
+//            
+//  /* incremental layout options */
+//              
+//  // Node repulsion (non overlapping) multiplier
+//  nodeRepulsion: node => 4500,
+//  // Ideal edge (non nested) length
+//  idealEdgeLength: edge => 50,
+//  // Divisor to compute edge forces
+//  edgeElasticity: edge => 0.45,
+//  // Nesting factor (multiplier) to compute ideal edge length for nested edges
+//  nestingFactor: 0.1,
+//  // Maximum number of iterations to perform
+//  numIter: 2500,
+//  // For enabling tiling
+//  tile: true,  
+//  // Represents the amount of the vertical space to put between the zero degree members during the tiling operation(can also be a function)
+//  tilingPaddingVertical: 10,
+//  // Represents the amount of the horizontal space to put between the zero degree members during the tiling operation(can also be a function)
+//  tilingPaddingHorizontal: 10,
+//  // Gravity force (constant)
+//  gravity: 0.25,
+//  // Gravity range (constant) for compounds
+//  gravityRangeCompound: 1.5,
+//  // Gravity force (constant) for compounds
+//  gravityCompound: 1.0,
+//  // Gravity range (constant)
+//  gravityRange: 3.8, 
+//  // Initial cooling factor for incremental layout  
+//  initialEnergyOnIncremental: 0.3,
+//
+//  /* constraint options */
+//
+//  // Fix desired nodes to predefined positions
+//  // [{nodeId: 'n1', position: {x: 100, y: 200}}, {...}]
+//
+//  //fixedNodeConstraint: undefined,
+//  fixedNodeConstraint:  [
+//    {
+//      "nodeId": "f1",
+//      "position": {
+//        "x": 150,
+//        "y": 100
+//      }
+//    },
+//    {
+//      "nodeId": "f2",
+//      "position": {
+//        "x": 50,
+//        "y": 150
+//      }
+//    },
+//    {
+//      "nodeId": "f3",
+//      "position": {
+//        "x": 200,
+//        "y": 250
+//      }
+//    }
+//  ],
+//
+//  // Align desired nodes in vertical/horizontal direction
+//  // {vertical: [['n1', 'n2'], [...]], horizontal: [['n2', 'n4'], [...]]}
+//  alignmentConstraint: undefined,
+//  // Place two nodes relatively in vertical/horizontal direction
+//  // [{top: 'n1', bottom: 'n2', gap: 100}, {left: 'n3', right: 'n4', gap: 75}, {...}]
+//  relativePlacementConstraint: undefined,
+//
+//  /* layout event callbacks */
+//  ready: () => {}, // on layoutready
+//  stop: () => {} // on layoutstop
+//};
+
 @Component({
   selector: 'app-root',
   template: `
-    <h2>Cytoscape-Angular Demo</h2>
-    <p>This web app demonstrates the use of
-      <a href="https://github.com/michaelbushe/cytoscape-angular">cytoscape-angular</a>, an open source (MIT license)
-      library of
-      <a href="https://angular.io">Angular</a> components for <a href="https://cytoscape.org/">Cytoscape</a>,
-      a widely used graphing tool and the de facto standard graphing tool for bioinformatics.</p>
-    <p>cytoscape-angular provides a complete API for <a href="https://js.cytoscape.org/">cytoscape.js</a> in an Angular
-      component. Angular is a a comprehensive user interface framework that creates fully deployable web and mobile
-      applications quickly. </p>
-    <p>cytoscape-angular also provides toolbar components for adjusting layout and style on the fly and
-      saving the resulting cytoscape layout json and stylesheet json for rapid graph customization.</p>
-    <p>Another app for minds by <a href="https://www.mindfulsoftware.com" style="color: rgb(77, 122, 13)">Mindful
-      Software</a> with <a href="https://www.kaavio.com" style="color: rgb(34, 23, 183)">Kaavio</a>. Data from <a href="http://graphspace.org/">Graphspace</a>.
-    </p>
-    <h4>TGF-beta-Receptor</h4>
-    <div style="display: flex;">
-      <cytoscape-graph #biggraph title="TGF-beta-Receptor"
-                       class="medium-graph"
-                       debug="true"
-                       showToolbar="true"
-                       [nodes]="bigGraphNodes"
-                       [edges]="bigGraphEdges"
-                       [style]="bigGraphStylesheet"
-                       [layoutOptions]="bigGraphLayoutOptions">
-
-      </cytoscape-graph>
+    <div>
       <cytoscape-graph-toolbar [(layoutOptions)]="bigGraphLayoutOptions"
                                [(styles)]="bigGraphStylesheet"
                                [showToolbarButtons]="true"
@@ -44,8 +171,21 @@ declare var cytoscape: any
                                (styleSelectorChange)="bigGraphLayoutStylesSelectorChange($event)"
                                [nodes]="bigGraphNodes"
                                [edges]="bigGraphEdges"
-                               direction="column"
+                               direction="rown"
       ></cytoscape-graph-toolbar>
+      
+    </div>
+    <div style="display: flex;">
+      <cytoscape-graph #biggraph title="TGF-beta-Receptor"
+                       class="medium-graph"
+                       debug="false"
+                       showToolbar="true"
+                       [nodes]="bigGraphNodes"
+                       [edges]="bigGraphEdges"
+                       [style]="bigGraphStylesheet"
+                       [layoutOptions]="bigGraphLayoutOptions">
+
+      </cytoscape-graph>
     </div>
   `,
   styles: [
@@ -58,17 +198,20 @@ declare var cytoscape: any
       }
 
       .medium-graph {
-        width: 600px;
+        width: 100%;
         height: 600px;
         border: 1px solid rgb(77, 122, 13);
       }
     `
   ]
 })
+
+
 export class AppComponent implements OnInit{
   @ViewChild('biggraph')
   bigGraph: CytoscapeGraphComponent
   bigGraphLayoutOptions = new CoseLayoutOptionsImpl()
+  //bigGraphLayoutOptions = defaultOptions
   bigGraphNodes: NodeDefinition[] = []
   bigGraphEdges: EdgeDefinition[] = []
   bigGraphStylesheet: Stylesheet[] = [new StylesheetImpl()]
@@ -76,9 +219,18 @@ export class AppComponent implements OnInit{
   constructor(public cyNodeService: CyNodeService) {
   }
 
+  
   ngOnInit(): void {
-    cytoscape.use(dagre)
-    let bigChart = 'Signaling-by-Activin TO Signaling-by-TGF-beta-Receptor-Complex k=3' // 'pathogenesis-weighted-test-4'  // 'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
+    cytoscape.use(cola)
+    //cytoscape.use(dagre)
+    //cytoscape.use(fcose)
+    //let bigChart = 'Signaling-by-Activin TO Signaling-by-TGF-beta-Receptor-Complex k=3' // 'pathogenesis-weighted-test-4'  // 'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
+    //let bigChart = 'pathogenesis-weighted-test-4'  
+    //let bigChart = 'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
+    //let bigChart = 'test_2'
+    let bigChart = 'test1'
+
+
     this.cyNodeService.getStylesheet(bigChart).subscribe(stylesheet => {
       return this.cyNodeService.getData(bigChart).subscribe(result => {
         this.stampNodeAndElementGroupsAndDeleteFields(result, ['curve-style'])
@@ -88,6 +240,32 @@ export class AppComponent implements OnInit{
       })
     })
   }
+  
+/*
+  ngOnInit(): void {
+    cytoscape.use(dagre)
+    //cytoscape.use(fcose)
+    let bigChart = 'Signaling-by-Activin TO Signaling-by-TGF-beta-Receptor-Complex k=3'
+    //let bigChart = 'pathogenesis-weighted-test-4'  
+    //let bigChart = 'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
+    //let bigChart = 'test_2'
+
+    let constraintObject = JSON.parse( content );
+    let constraints = {
+                       fixedNodeConstraint: constraintObject.fixedNodeConstraint;,
+                       alignmentConstraint: undefined,
+                       relativePlacementConstraint: undefined
+                     };
+    this.cyNodeService.getStylesheet(bigChart).subscribe(stylesheet => {
+      return this.cyNodeService.getData(bigChart).subscribe(result => {
+        this.stampNodeAndElementGroupsAndDeleteFields(result, ['curve-style'])
+        this.bigGraphStylesheet = stylesheet.style
+        this.bigGraphNodes = result.elements.nodes
+        this.bigGraphEdges = result.elements.edges
+      })
+    })
+  }
+*/
 
   @HostListener('window:beforeunload', ['$event'])
   ngOnDestroy() {
@@ -100,7 +278,7 @@ export class AppComponent implements OnInit{
     })
     result.elements.edges.forEach(edge => {
       edge.group = 'edges'
-      this.deleteFields(edge.style, edgeFields)
+      //this.deleteFields(edge.style, edgeFields)
     })
   }
 
