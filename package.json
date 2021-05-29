@@ -78,6 +78,7 @@
   },
   "dependencies": {
     "cytoscape-angular": "./dist/cytoscape-angular",
-    "cytoscape-fcose": "^2.0.0"
+    "cytoscape-fcose": "^2.0.0",
+    "cytoscape-sbgn-stylesheet": "^4.0.2"
   }
 }

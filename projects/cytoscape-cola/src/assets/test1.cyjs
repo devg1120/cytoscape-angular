@@ -15,7 +15,7 @@
           {"data": {"id": "f3", "parent": "n8"}, "classes": ["fixed"]}
         ],
         "edges": [
-          {"data": {"source": "n1", "target": "f1"}},
+          {"data": {"source": "n1", "target": "f1", "label":"100"}},
           {"data": {"source": "n1", "target": "n3"}},
           {"data": {"source": "f1", "target": "n2"}},
           {"data": {"source": "f1", "target": "n3"}},
