@@ -4,7 +4,7 @@ import * as cytoscape_ from 'cytoscape';
 
 import dagre from 'cytoscape-dagre'
 import { CyNodeService } from './cy-node.service'
-import { PresetLayoutOptionsImpl, DagreLayoutOptionsImpl , CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular'
+import { DagreLayoutOptionsImpl , CoseLayoutOptionsImpl, CytoscapeGraphComponent } from 'cytoscape-angular'
 import { StylesheetImpl } from '../../../cytoscape-angular/src/lib/style/style'
 //import { sbgnStylesheet } from 'cytoscape-sbgn-stylesheet'
 import sbgnStylesheet from 'cytoscape-sbgn-stylesheet';
@@ -66,35 +66,42 @@ export class AppComponent implements OnInit{
   @ViewChild('biggraph')
   bigGraph: CytoscapeGraphComponent
   //bigGraphLayoutOptions = new CoseLayoutOptionsImpl()
-  bigGraphLayoutOptions = new PresetLayoutOptionsImpl()
+  bigGraphLayoutOptions = new DagreLayoutOptionsImpl()
   bigGraphNodes: NodeDefinition[] = []
   bigGraphEdges: EdgeDefinition[] = []
   bigGraphStylesheet: Stylesheet[] = [new StylesheetImpl()]
+  bigGraphStylesheet2: Stylesheet[] = [new StylesheetImpl()]
+  //bigGraphStylesheet: Stylesheet[] = sbgnStylesheet(cytoscape)
+  //bigGraphStylesheet: Stylesheet[] = [new StylesheetImpl(sbgnStylesheet)]
 
   constructor(public cyNodeService: CyNodeService) {
   }
 
   ngOnInit(): void {
-    //cytoscape.use(dagre)
+  cytoscape.use(dagre)
+    //let bigChart = 'Signaling-by-Activin TO Signaling-by-TGF-beta-Receptor-Complex k=3' // 'pathogenesis-weighted-test-4'  // 'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
+    //let bigChart =   'NetPath-Brain-derived-neurotrophic-factor-(BDNF)-pathway'
     //let bigChart = 'test1'
     let bigChart = 'sbgn'
-
-    /*
     //let style = sbgnStylesheet(cytoscape_)
+    let style = sbgnStylesheet(cytoscape)
+    //this.bigGraphStylesheet = [sbgnStylesheet(cytoscape_)]
     console.log('=================')
-    this.dump1(style)
+      this.dump1(style)
     console.log('=================')
     let style2 = this.convert(style)
     console.log('+++++++++++++++++')
     this.dump2(style2)
     console.log('+++++++++++++++++')
-    */
+        this.bigGraphStylesheet = style2
 
     this.cyNodeService.getStylesheet(bigChart).subscribe(stylesheet => {
       return this.cyNodeService.getData(bigChart).subscribe(result => {
         this.stampNodeAndElementGroupsAndDeleteFields(result, ['curve-style'])
-        //this.bigGraphStylesheet = stylesheest.style
-        this.bigGraphStylesheet = sbgnStylesheet(cytoscape)
+        this.bigGraphStylesheet = stylesheet.style
+        //    console.log('-----------------')
+        //      this.dump2(stylesheet.style)
+        //    console.log('-----------------')
         this.bigGraphNodes = result.elements.nodes
         this.bigGraphEdges = result.elements.edges
       })
@@ -109,6 +116,11 @@ export class AppComponent implements OnInit{
   private convert(style) {
 
     let selector_obj_array =[]
+    //const selector_obj = {
+    //  selector: "",
+    //  style: {}
+    //}
+
      for (let i = 0;  i < style.length; i++) {
         console.dir(style[i].selector)
         const selector_obj = {}
@@ -124,6 +136,21 @@ export class AppComponent implements OnInit{
      }
      return selector_obj_array
 
+  /*
+     console.dir(style)
+     //printt(style)
+     //console.log(style.length)
+     //console.dir(style[0].selector)
+     //console.dir(style[1].selector)
+
+     for (let i = 0;  i < style.length; i++) {
+        console.dir(style[i].selector)
+        for (let p = 0;  p < style[i].properties.length; p++) {
+             console.log("   " + style[i].properties[p].name)
+             console.log("        " + style[i].properties[p].value)
+             }
+     }
+   */
   }
   private dump1(style) {
      console.dir(style)
@@ -142,6 +169,13 @@ export class AppComponent implements OnInit{
   }
   private dump2(style) {
      console.dir(style)
+     //printt(style)
+     //console.log(style.length)
+
+     //console.dir(style[0].selector)
+     //console.dir(style[0].style)
+     //console.dir(style[0].style["background-color"])
+
      for (let i = 0;  i < style.length; i++) {
         console.log("selector: " + style[i].selector)
         console.log("style: ")
@@ -150,6 +184,10 @@ export class AppComponent implements OnInit{
             console.log("     value: " + style[i].style[key]) ;
         });
 
+     //   for (let p = 0;  p < style[i].properties.length; p++) {
+     //        console.log("   " + style[i].properties[p].name)
+     //        console.log("        " + style[i].properties[p].value)
+     //        }
      }
   }
   private stampNodeAndElementGroupsAndDeleteFields(result, edgeFields: string[]) {
